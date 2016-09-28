@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Ben Morris</title><link href="http://www.bendmorris.com/" rel="alternate"></link><link href="http://www.bendmorris.com/feeds/ben-morris.atom.xml" rel="self"></link><id>http://www.bendmorris.com/</id><updated>2014-06-25T00:00:00-07:00</updated><entry><title>Coming July 1: GRADQUEST</title><link href="http://www.bendmorris.com/blog/coming-july-1-gradquest.html" rel="alternate"></link><updated>2014-06-25T00:00:00-07:00</updated><author><name>Ben Morris</name></author><id>tag:www.bendmorris.com,2014-06-25:blog/coming-july-1-gradquest.html</id><summary type="html">&lt;p&gt;*Update: the game has been released! &lt;a href="http://www.monsterfacegames.com/games/gradquest.html"&gt;You can play it by following the links 
+here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;I'm planning on releasing my upcoming game, GRADQUEST, on (at minimum)
+Kongregate and Google Play on Tuesday, July 1. Short notice, but I decided to
+set a hard deadline to release GRADQUEST because it's the only way I'll ever
+finish it and get it out the door.&lt;/p&gt;
+&lt;div class="text-center"&gt;
+    &lt;a href="/images/blog/gradquest-ss1.png"&gt;
+        &lt;img class="img-thumbnail" src="/images/blog/gradquest-ss1.png" alt="GRADQUEST title screen" title="GRADQUEST title screen" /&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+
+&lt;p&gt;When I first came up with the idea for GRADQUEST, I was a graduate student in a 
+PhD program in ecology and evolutionary biology and making games was a hobby. 
+Feeling somewhat burned out, I decided to take a breather and make a game. The 
+idea was to take a cynical look at graduate school life and try to use game 
+mechanics to tell a story about being a (literally) faceless grad student. It 
+was a joke at the time. A couple months later, I admitted to myself that this 
+really &lt;em&gt;was&lt;/em&gt; how I viewed graduate school and made the decision to leave.&lt;/p&gt;
+&lt;p&gt;I don't want to spoil too much, but I wanted to highlight a few examples of how 
+I've tried to portray grad student life through game mechanics.&lt;/p&gt;
+&lt;h3&gt;The rules are unclear&lt;/h3&gt;
+&lt;p&gt;The game is intentionally very opaque about how it should be played. There are
+instructions that tell you &lt;em&gt;how&lt;/em&gt; to do things, but you're never really told
+&lt;em&gt;what&lt;/em&gt; to do or given any sort of overarching goal. I assume most players will
+try to complete their dissertation and graduate, and maybe become a professor.
+But, is that the best outcome? Is that "winning?"&lt;/p&gt;
+&lt;p&gt;A very interesting lesson from game design is that if you put an obstacle in 
+front of a player, they'll try to overcome it, sometimes without question. In a 
+kind of &lt;a href="http://en.wikipedia.org/wiki/Milgram_experiment"&gt;Milgram&lt;/a&gt;-esque way, 
+you can lead players to do things that may not actually be in their best 
+interest by creating a series of short-term obstacles and a sense of achievement 
+when overcoming them. I once played a text adventure where the goal was to 
+torture a prisoner, and you had to be specific about what you wanted to do to 
+which body part. He would scream or mutter in another language or cry. You had 
+no context, just a vague goal and actions that elicited responses. It never 
+ended; I just stopped playing after a while. In these kinds of situations, the 
+question becomes: how long will the player stay in the box you put them in?&lt;/p&gt;
+&lt;p&gt;GRADQUEST is not nice to players. It mocks them if they ask for help:&lt;/p&gt;
+&lt;div class="text-center"&gt;
+    &lt;a href="/images/blog/gradquest-ss2.png"&gt;
+        &lt;img class="img-thumbnail" src="/images/blog/gradquest-ss2.png" alt="maybe you don't belong here" title="maybe you don't belong here" /&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Most graduate students go through periods of &lt;a href="https://en.wikipedia.org/wiki/Imposter_syndrome"&gt;imposter 
+syndrome&lt;/a&gt; at some point during 
+their education. I know I did. It makes it difficult to ask questions, as it 
+feels like you &lt;em&gt;should&lt;/em&gt; know what you're doing at this point. But so many of us 
+really don't.&lt;/p&gt;
+&lt;p&gt;As a result, in GRADQUEST, you don't really have any direction as to what you 
+should be doing, and your advisor (not based on my own advisor, by the way!) is 
+comically detached and unhelpful. There are always a set of very obvious things 
+you &lt;em&gt;could&lt;/em&gt; do, but will they help you reach your goal or are they just 
+distractions?&lt;/p&gt;
+&lt;h3&gt;You have no control: success is random&lt;/h3&gt;
+&lt;p&gt;Success in academia, despite popular belief, is not about how smart you are or
+how hard you work. In the end, your success or failure will be determined by a
+host of factors, many of which you have no control over.&lt;/p&gt;
+&lt;p&gt;In the game, players choose how many tasks they'll try to accomplish each 
+semester (taking courses, doing research, trying to earn money), then distribute
+a limited pool of dice among those tasks. A roll of the dice, plus whatever
+revelant skill the player has developed, determines success or failure. Trying
+to do too much will result in spreading your effort too thin and failing at
+everything; do too little and you'll run out of time before you meet all the
+requirements.&lt;/p&gt;
+&lt;div class="text-center"&gt;
+    &lt;a href="/images/blog/gradquest-ss3.png"&gt;
+        &lt;img class="img-thumbnail" src="/images/blog/gradquest-ss3.png" alt="assign dice" title="assign dice" /&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+
+&lt;p&gt;In earlier prototypes of the game, the sense of chaos and futility was even more 
+pronounced. There was no dice allocation. Skills were completely meaningless;
+for every point you increased a skill, the difficulty when using that skill
+would just go up as well. This was a little too cynical and not enough of a
+game, so I made some modifications.&lt;/p&gt;
+&lt;div class="text-center"&gt;
+    &lt;a href="/images/blog/gradquest-ss6.png"&gt;
+        &lt;img class="img-thumbnail" src="/images/blog/gradquest-ss6.png" alt="your car broke down" title="your car broke down" /&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Success isn't the only thing that you can't control. Plenty of things can go 
+wrong at some point and there's nothing you can do to prevent them. You may
+suddenly discover an undiagnosed health problem. You may have very difficult
+financial issues and struggle to find funding and pay rent. Your dog might die.
+All these things can get in the way of making progress toward your degree.&lt;/p&gt;
+&lt;p&gt;On the other hand, you might suddenly win a national fellowship and have smooth 
+sailing from that point on. (Ironically, a few months after deciding to leave
+graduate school myself, I was awarded an NSF graduate fellowship. A little late,
+guys.)&lt;/p&gt;
+&lt;h3&gt;You will almost certainly fail&lt;/h3&gt;
+&lt;div class="text-center"&gt;
+    &lt;a href="/images/blog/gradquest-ss4.png"&gt;
+        &lt;img class="img-thumbnail" src="/images/blog/gradquest-ss4.png" alt="semester budget" title="semester budget" /&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Good luck paying all that debt off with your degree in Historical Blorbology!&lt;/p&gt;
+&lt;p&gt;The odds of "succeeding" (using a very narrow definition of success) at any
+stage in academia are low. &lt;a href="http://chronicle.com/article/PhD-Attrition-How-Much-Is/140045/"&gt;50% of doctoral
+students&lt;/a&gt; leave
+without graduating. Around 2% of those that do graduate will become professors.
+However, in real life, we tend to think that we are somehow different from
+everyone else. We can beat those odds. Sure, lots of people won't make it, but
+I'm special!&lt;/p&gt;
+&lt;div class="text-center"&gt;
+    &lt;a href="/images/blog/gradquest-ss5.png"&gt;
+        &lt;img class="img-thumbnail" src="/images/blog/gradquest-ss5.png" alt="new character screen" title="new character screen" /&gt;
+    &lt;/a&gt;
+&lt;/div&gt;
+
+&lt;p&gt;In GRADQUEST, you're not special. In fact, you have no control over any aspect 
+of yourself except how you spend your time. Everything, from your appearance to 
+attributes and background, are randomly generated. If you don't like what you 
+get, you can roll again, but many factors - financial obligations, for example - 
+are random and initially hidden from the player. You also don't know how or 
+which visible attributes might affect the game. Does it matter that I have 
+glasses? That I'm female? My school or field? Quantitative skills? Skin color? 
+These are things you don't always have control over in real life. I didn't think 
+it was fair to give the player too much control.&lt;/p&gt;
+&lt;p&gt;It may take several playthroughs to get a job as a professor, and a few more to
+get tenure. Unfortunately in real life you can't insert a quarter and try again.&lt;/p&gt;
+&lt;h3&gt;Depressed yet?&lt;/h3&gt;
+&lt;p&gt;I hope not! I actually find the game pretty fun, and it's been cathartic to make
+and play. There's something deeply fulfilling about struggling to succeed in a
+world that's designed to bring you down, as long as you know what you're getting
+yourself into. The game is simple enough to play through - it shouldn't take you
+more than about 20 minutes each time. There are lots of possibilities and
+outcomes, so things can go differently each time you play.&lt;/p&gt;
+&lt;p&gt;Hope you'll give GRADQUEST a try on July 1. Good luck!&lt;/p&gt;</summary><category term="gradquest"></category><category term="game design"></category></entry><entry><title>Hello again!</title><link href="http://www.bendmorris.com/blog/hello-again.html" rel="alternate"></link><updated>2014-06-19T00:00:00-07:00</updated><author><name>Ben Morris</name></author><id>tag:www.bendmorris.com,2014-06-19:blog/hello-again.html</id><summary type="html">&lt;p&gt;My old website and blog was boring, so here's a new one. Previously, 
+my web site was hosted on Blogger, but I'm moving to a static site generated by 
+&lt;a href="http://getpelican.com"&gt;Pelican&lt;/a&gt;. I'm making a goal to blog more actively and 
+share content from games I'm working on.&lt;/p&gt;
+&lt;p&gt;Stay tuned!&lt;/p&gt;</summary></entry></feed>
