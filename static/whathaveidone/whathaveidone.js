@@ -13,7 +13,7 @@ var ApplicationMain = function() { };
 $hxClasses["ApplicationMain"] = ApplicationMain;
 ApplicationMain.__name__ = ["ApplicationMain"];
 ApplicationMain.main = function() {
-	ApplicationMain.config = { build : "12", company : "MouseMob", file : "whathaveidone", fps : 60, name : "whathaveidone", orientation : "portrait", packageName : "com.example.myapp", version : "0.1.0", windows : [{ allowHighDPI : false, antialiasing : 4, background : 0, borderless : false, depthBuffer : false, display : 0, fullscreen : false, hardware : true, height : 480, hidden : null, maximized : null, minimized : null, parameters : "{}", resizable : true, stencilBuffer : true, title : "whathaveidone", vsync : true, width : 800, x : null, y : null}]};
+	ApplicationMain.config = { build : "14", company : "MouseMob", file : "whathaveidone", fps : 60, name : "whathaveidone", orientation : "portrait", packageName : "com.example.myapp", version : "0.1.0", windows : [{ allowHighDPI : false, antialiasing : 4, background : 0, borderless : false, depthBuffer : false, display : 0, fullscreen : false, hardware : true, height : 480, hidden : null, maximized : null, minimized : null, parameters : "{}", resizable : true, stencilBuffer : true, title : "whathaveidone", vsync : true, width : 800, x : null, y : null}]};
 };
 ApplicationMain.create = function() {
 	var app = new openfl_display_Application();
@@ -126,6 +126,8 @@ ApplicationMain.create = function() {
 	urls.push("assets/sounds/give.wav");
 	types.push("SOUND");
 	urls.push("assets/sounds/glomp.wav");
+	types.push("SOUND");
+	urls.push("assets/sounds/sad.wav");
 	types.push("SOUND");
 	urls.push("assets/sounds/shot.wav");
 	types.push("SOUND");
@@ -2020,6 +2022,9 @@ var DefaultAssetLibrary = function() {
 	this.path.set(id,id);
 	this.type.set(id,"SOUND");
 	id = "assets/sounds/glomp.wav";
+	this.path.set(id,id);
+	this.type.set(id,"SOUND");
+	id = "assets/sounds/sad.wav";
 	this.path.set(id,id);
 	this.type.set(id,"SOUND");
 	id = "assets/sounds/shot.wav";
@@ -15527,7 +15532,7 @@ var lime_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 736168;
+	this.version = 873794;
 };
 $hxClasses["lime.AssetCache"] = lime_AssetCache;
 lime_AssetCache.__name__ = ["lime","AssetCache"];
