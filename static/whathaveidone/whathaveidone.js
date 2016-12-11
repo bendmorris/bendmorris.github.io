@@ -13,7 +13,7 @@ var ApplicationMain = function() { };
 $hxClasses["ApplicationMain"] = ApplicationMain;
 ApplicationMain.__name__ = ["ApplicationMain"];
 ApplicationMain.main = function() {
-	ApplicationMain.config = { build : "9", company : "MouseMob", file : "whathaveidone", fps : 60, name : "whathaveidone", orientation : "portrait", packageName : "com.example.myapp", version : "0.1.0", windows : [{ allowHighDPI : false, antialiasing : 4, background : 0, borderless : false, depthBuffer : false, display : 0, fullscreen : false, hardware : true, height : 480, hidden : null, maximized : null, minimized : null, parameters : "{}", resizable : true, stencilBuffer : true, title : "whathaveidone", vsync : true, width : 800, x : null, y : null}]};
+	ApplicationMain.config = { build : "10", company : "MouseMob", file : "whathaveidone", fps : 60, name : "whathaveidone", orientation : "portrait", packageName : "com.example.myapp", version : "0.1.0", windows : [{ allowHighDPI : false, antialiasing : 4, background : 0, borderless : false, depthBuffer : false, display : 0, fullscreen : false, hardware : true, height : 480, hidden : null, maximized : null, minimized : null, parameters : "{}", resizable : true, stencilBuffer : true, title : "whathaveidone", vsync : true, width : 800, x : null, y : null}]};
 };
 ApplicationMain.create = function() {
 	var app = new openfl_display_Application();
@@ -35,6 +35,8 @@ ApplicationMain.create = function() {
 	types.push("IMAGE");
 	urls.push("assets/graphics/bigslime.png");
 	types.push("IMAGE");
+	urls.push("assets/graphics/bigspider.png");
+	types.push("IMAGE");
 	urls.push("assets/graphics/blob.png");
 	types.push("IMAGE");
 	urls.push("assets/graphics/bubble.png");
@@ -44,6 +46,8 @@ ApplicationMain.create = function() {
 	urls.push("assets/graphics/egg.png");
 	types.push("IMAGE");
 	urls.push("assets/graphics/gameover.png");
+	types.push("IMAGE");
+	urls.push("assets/graphics/icon.png");
 	types.push("IMAGE");
 	urls.push("assets/graphics/icons.png");
 	types.push("IMAGE");
@@ -56,6 +60,8 @@ ApplicationMain.create = function() {
 	urls.push("assets/graphics/shadow.png");
 	types.push("IMAGE");
 	urls.push("assets/graphics/slime.png");
+	types.push("IMAGE");
+	urls.push("assets/graphics/spider.png");
 	types.push("IMAGE");
 	urls.push("assets/graphics/steam.png");
 	types.push("IMAGE");
@@ -77,6 +83,10 @@ ApplicationMain.create = function() {
 	types.push("TEXT");
 	urls.push("assets/graphics/bigslime.json");
 	types.push("TEXT");
+	urls.push("assets/graphics/bigspider.atlas");
+	types.push("TEXT");
+	urls.push("assets/graphics/bigspider.json");
+	types.push("TEXT");
 	urls.push("assets/graphics/blob.atlas");
 	types.push("TEXT");
 	urls.push("assets/graphics/blob.json");
@@ -92,6 +102,10 @@ ApplicationMain.create = function() {
 	urls.push("assets/graphics/slime.atlas");
 	types.push("TEXT");
 	urls.push("assets/graphics/slime.json");
+	types.push("TEXT");
+	urls.push("assets/graphics/spider.atlas");
+	types.push("TEXT");
+	urls.push("assets/graphics/spider.json");
 	types.push("TEXT");
 	urls.push("assets/graphics/sword.atlas");
 	types.push("TEXT");
@@ -1868,6 +1882,9 @@ var DefaultAssetLibrary = function() {
 	id = "assets/graphics/bigslime.png";
 	this.path.set(id,id);
 	this.type.set(id,"IMAGE");
+	id = "assets/graphics/bigspider.png";
+	this.path.set(id,id);
+	this.type.set(id,"IMAGE");
 	id = "assets/graphics/blob.png";
 	this.path.set(id,id);
 	this.type.set(id,"IMAGE");
@@ -1881,6 +1898,9 @@ var DefaultAssetLibrary = function() {
 	this.path.set(id,id);
 	this.type.set(id,"IMAGE");
 	id = "assets/graphics/gameover.png";
+	this.path.set(id,id);
+	this.type.set(id,"IMAGE");
+	id = "assets/graphics/icon.png";
 	this.path.set(id,id);
 	this.type.set(id,"IMAGE");
 	id = "assets/graphics/icons.png";
@@ -1899,6 +1919,9 @@ var DefaultAssetLibrary = function() {
 	this.path.set(id,id);
 	this.type.set(id,"IMAGE");
 	id = "assets/graphics/slime.png";
+	this.path.set(id,id);
+	this.type.set(id,"IMAGE");
+	id = "assets/graphics/spider.png";
 	this.path.set(id,id);
 	this.type.set(id,"IMAGE");
 	id = "assets/graphics/steam.png";
@@ -1931,6 +1954,12 @@ var DefaultAssetLibrary = function() {
 	id = "assets/graphics/bigslime.json";
 	this.path.set(id,id);
 	this.type.set(id,"TEXT");
+	id = "assets/graphics/bigspider.atlas";
+	this.path.set(id,id);
+	this.type.set(id,"TEXT");
+	id = "assets/graphics/bigspider.json";
+	this.path.set(id,id);
+	this.type.set(id,"TEXT");
 	id = "assets/graphics/blob.atlas";
 	this.path.set(id,id);
 	this.type.set(id,"TEXT");
@@ -1953,6 +1982,12 @@ var DefaultAssetLibrary = function() {
 	this.path.set(id,id);
 	this.type.set(id,"TEXT");
 	id = "assets/graphics/slime.json";
+	this.path.set(id,id);
+	this.type.set(id,"TEXT");
+	id = "assets/graphics/spider.atlas";
+	this.path.set(id,id);
+	this.type.set(id,"TEXT");
+	id = "assets/graphics/spider.json";
 	this.path.set(id,id);
 	this.type.set(id,"TEXT");
 	id = "assets/graphics/sword.atlas";
@@ -15487,7 +15522,7 @@ var lime_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 374013;
+	this.version = 76199;
 };
 $hxClasses["lime.AssetCache"] = lime_AssetCache;
 lime_AssetCache.__name__ = ["lime","AssetCache"];
@@ -51986,6 +52021,7 @@ var whathaveidone_entities_Monster = function() {
 	this.avgHappiness = 0;
 	this.pooProgress = 0;
 	this.cracks = 0;
+	this.sickCount = 0;
 	this.behavior = null;
 	this.progress = 0;
 	this.happy = 0;
@@ -52047,7 +52083,7 @@ whathaveidone_entities_Monster.prototype = $extend(com_haxepunk_Entity.prototype
 		case 1:
 			return 15;
 		default:
-			return 120;
+			return 10;
 		}
 	}
 	,get_speed: function() {
@@ -52064,6 +52100,7 @@ whathaveidone_entities_Monster.prototype = $extend(com_haxepunk_Entity.prototype
 	,emitter: null
 	,bubble: null
 	,behavior: null
+	,sickCount: null
 	,cracks: null
 	,pooProgress: null
 	,avgHappiness: null
@@ -52208,11 +52245,16 @@ whathaveidone_entities_Monster.prototype = $extend(com_haxepunk_Entity.prototype
 			whathaveidone_Music.play("main");
 			break;
 		case "blob":
-			var choices = ["slime","mammal","bat"];
-			this.monsterType = choices[Std["int"](Math.round(this.avgHappiness * choices.length))];
+			if(this.sickCount >= 3) this.monsterType = "slime"; else {
+				var choices = ["spider","mammal","bat"];
+				this.monsterType = choices[Std["int"](Math.round(this.avgHappiness * choices.length))];
+			}
 			break;
 		case "slime":
 			this.monsterType = "bigslime";
+			break;
+		case "spider":
+			this.monsterType = "bigspider";
 			break;
 		case "mammal":
 			this.monsterType = "bigmammal";
@@ -52257,8 +52299,11 @@ whathaveidone_entities_Monster.prototype = $extend(com_haxepunk_Entity.prototype
 					++this.pooProgress;
 					if(this.level < 4) {
 						var sickChance;
-						if(this.findPoo() == null) sickChance = 0.05; else sickChance = 0.75;
-						if(Math.random() < sickChance) this.sick = true;
+						if(this.findPoo() == null) sickChance = 0.05; else sickChance = 1;
+						if(Math.random() < sickChance) {
+							this.sick = true;
+							++this.sickCount;
+						}
 					}
 				}
 				break;
@@ -52329,7 +52374,6 @@ var whathaveidone_entities_Poo = function() {
 	this.addGraphic(this.emitter);
 	this.set_width(this.poo.get_width());
 	this.set_height(this.poo.get_height());
-	this.set_layer(Std["int"](com_haxepunk_HXP.height * 2 - (this.get_y() + 4)));
 };
 $hxClasses["whathaveidone.entities.Poo"] = whathaveidone_entities_Poo;
 whathaveidone_entities_Poo.__name__ = ["whathaveidone","entities","Poo"];
@@ -52348,6 +52392,7 @@ whathaveidone_entities_Poo.prototype = $extend(com_haxepunk_Entity.prototype,{
 			this.poo.set_alpha(this.eliminateTimer / 0.75);
 			if(this.eliminateTimer <= 0) this._scene.remove(this);
 		}
+		this.set_layer(Std["int"](com_haxepunk_HXP.height * 2 - (this.get_y() + 4)));
 	}
 	,__class__: whathaveidone_entities_Poo
 });
@@ -54501,7 +54546,7 @@ whathaveidone_entities_Monster.HUNGRY_HEART_SECONDS = 30;
 whathaveidone_entities_Monster.HAPPY_HEART_SECONDS = 7.5;
 whathaveidone_entities_Monster.MEAT_TO_POO = 3;
 whathaveidone_entities_Monster.SICK_CHANCE = 0.05;
-whathaveidone_entities_Monster.POO_SICK_CHANCE = 0.75;
+whathaveidone_entities_Monster.POO_SICK_CHANCE = 1;
 whathaveidone_entities_Poo.FLUSH_TIME = 1.5;
 whathaveidone_graphics_Flash.FLASH_TIME = 0.5;
 whathaveidone_graphics_SpineBase.CHAR_SCALE = 0.5;
