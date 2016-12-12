@@ -13,7 +13,7 @@ var ApplicationMain = function() { };
 $hxClasses["ApplicationMain"] = ApplicationMain;
 ApplicationMain.__name__ = ["ApplicationMain"];
 ApplicationMain.main = function() {
-	ApplicationMain.config = { build : "14", company : "MouseMob", file : "whathaveidone", fps : 60, name : "whathaveidone", orientation : "portrait", packageName : "com.example.myapp", version : "0.1.0", windows : [{ allowHighDPI : false, antialiasing : 4, background : 0, borderless : false, depthBuffer : false, display : 0, fullscreen : false, hardware : true, height : 480, hidden : null, maximized : null, minimized : null, parameters : "{}", resizable : true, stencilBuffer : true, title : "whathaveidone", vsync : true, width : 800, x : null, y : null}]};
+	ApplicationMain.config = { build : "15", company : "MouseMob", file : "whathaveidone", fps : 60, name : "whathaveidone", orientation : "portrait", packageName : "com.example.myapp", version : "0.1.0", windows : [{ allowHighDPI : false, antialiasing : 4, background : 0, borderless : false, depthBuffer : false, display : 0, fullscreen : false, hardware : true, height : 480, hidden : null, maximized : null, minimized : null, parameters : "{}", resizable : true, stencilBuffer : true, title : "whathaveidone", vsync : true, width : 800, x : null, y : null}]};
 };
 ApplicationMain.create = function() {
 	var app = new openfl_display_Application();
@@ -15532,7 +15532,7 @@ var lime_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 873794;
+	this.version = 537723;
 };
 $hxClasses["lime.AssetCache"] = lime_AssetCache;
 lime_AssetCache.__name__ = ["lime","AssetCache"];
@@ -52092,8 +52092,10 @@ whathaveidone_entities_Monster.prototype = $extend(com_haxepunk_Entity.prototype
 		switch(_g) {
 		case 1:
 			return 15;
-		default:
+		case 2:
 			return 120;
+		default:
+			return 90;
 		}
 	}
 	,get_speed: function() {
@@ -52574,12 +52576,14 @@ whathaveidone_graphics_MonsterSpine.prototype = $extend(whathaveidone_graphics_S
 	__class__: whathaveidone_graphics_MonsterSpine
 });
 var whathaveidone_scenes_GameOverScene = function() {
+	this.clickBuffer = 1;
 	com_haxepunk_Scene.call(this);
-	var txt = new com_haxepunk_graphics_BitmapText("I hoped it would end differently this time...",null,null,null,null,{ font : "assets/fonts/a_little_sunshine_regular_48.fnt"});
-	txt.x = 16;
-	txt.y = 16;
-	this.addGraphic(txt);
-	var img = new com_haxepunk_graphics_Image(com_haxepunk_HXP.renderMode == com_haxepunk_RenderMode.HARDWARE?(function($this) {
+	this.txt = new com_haxepunk_graphics_BitmapText("I hoped it would end differently this time...",null,null,null,null,{ font : "assets/fonts/a_little_sunshine_regular_48.fnt"});
+	this.txt.x = 16;
+	this.txt.y = 16;
+	this.txt.set_alpha(0);
+	this.addGraphic(this.txt);
+	this.img = new com_haxepunk_graphics_Image(com_haxepunk_HXP.renderMode == com_haxepunk_RenderMode.HARDWARE?(function($this) {
 		var $r;
 		var e = com_haxepunk_ds_Either.Right(com_haxepunk_graphics_atlas_Atlas.loadImageAsRegion((function($this) {
 			var $r;
@@ -52595,17 +52599,24 @@ var whathaveidone_scenes_GameOverScene = function() {
 		$r = e1;
 		return $r;
 	}(this)));
-	img.set_x((com_haxepunk_HXP.width - img.get_width()) / 2);
-	img.set_y((com_haxepunk_HXP.height - img.get_height()) / 2);
-	this.addGraphic(img);
-	this.transparent = true;
+	this.img.set_x((com_haxepunk_HXP.width - this.img.get_width()) / 2);
+	this.img.set_y((com_haxepunk_HXP.height - this.img.get_height()) / 2);
+	this.img.set_alpha(0);
+	this.addGraphic(this.img);
 };
 $hxClasses["whathaveidone.scenes.GameOverScene"] = whathaveidone_scenes_GameOverScene;
 whathaveidone_scenes_GameOverScene.__name__ = ["whathaveidone","scenes","GameOverScene"];
 whathaveidone_scenes_GameOverScene.__super__ = com_haxepunk_Scene;
 whathaveidone_scenes_GameOverScene.prototype = $extend(com_haxepunk_Scene.prototype,{
-	update: function() {
-		if(com_haxepunk_utils_Input.mousePressed) {
+	clickBuffer: null
+	,img: null
+	,txt: null
+	,update: function() {
+		if(this.clickBuffer > 0) {
+			this.clickBuffer -= com_haxepunk_HXP.elapsed / 5;
+			if(this.clickBuffer < 0) this.clickBuffer = 0;
+			this.txt.set_alpha(this.img.set_alpha(1 - this.clickBuffer));
+		} else if(com_haxepunk_utils_Input.mousePressed) {
 			com_haxepunk_HXP.engine.popScene();
 			com_haxepunk_HXP.engine.popScene();
 			com_haxepunk_HXP.engine.pushScene(new whathaveidone_scenes_GameScene());
@@ -52756,7 +52767,6 @@ var whathaveidone_scenes_TitleScene = function() {
 	txt.x = 16;
 	txt.y = 16;
 	this.addGraphic(txt);
-	this.transparent = true;
 };
 $hxClasses["whathaveidone.scenes.TitleScene"] = whathaveidone_scenes_TitleScene;
 whathaveidone_scenes_TitleScene.__name__ = ["whathaveidone","scenes","TitleScene"];
@@ -54562,5 +54572,6 @@ whathaveidone_entities_Poo.FLUSH_TIME = 1.5;
 whathaveidone_graphics_Flash.FLASH_TIME = 0.5;
 whathaveidone_graphics_SpineBase.CHAR_SCALE = 0.5;
 whathaveidone_graphics_SpineBase.skeletonDataCache = new haxe_ds_StringMap();
+whathaveidone_scenes_GameOverScene.FADE_TIME = 5;
 ApplicationMain.main();
 })(typeof console != "undefined" ? console : {log:function(){}}, typeof window != "undefined" ? window : typeof exports != "undefined" ? exports : typeof self != "undefined" ? self : this, typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);
