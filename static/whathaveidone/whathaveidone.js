@@ -13,7 +13,7 @@ var ApplicationMain = function() { };
 $hxClasses["ApplicationMain"] = ApplicationMain;
 ApplicationMain.__name__ = ["ApplicationMain"];
 ApplicationMain.main = function() {
-	ApplicationMain.config = { build : "15", company : "MouseMob", file : "whathaveidone", fps : 60, name : "whathaveidone", orientation : "portrait", packageName : "com.example.myapp", version : "0.1.0", windows : [{ allowHighDPI : false, antialiasing : 4, background : 0, borderless : false, depthBuffer : false, display : 0, fullscreen : false, hardware : true, height : 480, hidden : null, maximized : null, minimized : null, parameters : "{}", resizable : true, stencilBuffer : true, title : "whathaveidone", vsync : true, width : 800, x : null, y : null}]};
+	ApplicationMain.config = { build : "16", company : "MouseMob", file : "whathaveidone", fps : 60, name : "whathaveidone", orientation : "portrait", packageName : "com.example.myapp", version : "0.1.0", windows : [{ allowHighDPI : false, antialiasing : 4, background : 0, borderless : false, depthBuffer : false, display : 0, fullscreen : false, hardware : true, height : 480, hidden : null, maximized : null, minimized : null, parameters : "{}", resizable : true, stencilBuffer : true, title : "whathaveidone", vsync : true, width : 800, x : null, y : null}]};
 };
 ApplicationMain.create = function() {
 	var app = new openfl_display_Application();
@@ -25,6 +25,8 @@ ApplicationMain.create = function() {
 	ApplicationMain.preloader.create(ApplicationMain.config);
 	var urls = [];
 	var types = [];
+	urls.push("assets/graphics/ball.png");
+	types.push("IMAGE");
 	urls.push("assets/graphics/bat.png");
 	types.push("IMAGE");
 	urls.push("assets/graphics/bg.png");
@@ -127,11 +129,11 @@ ApplicationMain.create = function() {
 	types.push("SOUND");
 	urls.push("assets/sounds/glomp.wav");
 	types.push("SOUND");
+	urls.push("assets/sounds/hit.wav");
+	types.push("SOUND");
 	urls.push("assets/sounds/sad.wav");
 	types.push("SOUND");
 	urls.push("assets/sounds/shot.wav");
-	types.push("SOUND");
-	urls.push("assets/sounds/sword.wav");
 	types.push("SOUND");
 	urls.push("assets/music/creepy.ogg");
 	types.push("MUSIC");
@@ -1556,7 +1558,6 @@ com_haxepunk_Engine.prototype = $extend(openfl_display_Sprite.prototype,{
 			this._scene.end();
 			this._scene.updateLists();
 			if(this._scene.autoClear && this._scene.get_hasTween()) this._scene.clearTweens();
-			if(this.contains(this._scene.sprite)) this.removeChild(this._scene.sprite);
 			this._scene = this._scenes[this._scenes.length - 1];
 			this.addChild(this._scene.sprite);
 			com_haxepunk_HXP.camera = this._scene.camera;
@@ -1637,7 +1638,6 @@ com_haxepunk_Engine.prototype = $extend(openfl_display_Sprite.prototype,{
 			this._scene.end();
 			this._scene.updateLists();
 			if(this._scene.autoClear && this._scene.get_hasTween()) this._scene.clearTweens();
-			if(this.contains(this._scene.sprite)) this.removeChild(this._scene.sprite);
 			this._scene = this._scenes[this._scenes.length - 1];
 			this.addChild(this._scene.sprite);
 			com_haxepunk_HXP.camera = this._scene.camera;
@@ -1719,7 +1719,6 @@ com_haxepunk_Engine.prototype = $extend(openfl_display_Sprite.prototype,{
 			this._scene.end();
 			this._scene.updateLists();
 			if(this._scene.autoClear && this._scene.get_hasTween()) this._scene.clearTweens();
-			if(this.contains(this._scene.sprite)) this.removeChild(this._scene.sprite);
 			this._scene = this._scenes[this._scenes.length - 1];
 			this.addChild(this._scene.sprite);
 			com_haxepunk_HXP.camera = this._scene.camera;
@@ -1732,14 +1731,16 @@ com_haxepunk_Engine.prototype = $extend(openfl_display_Sprite.prototype,{
 		this._scenes.push(value);
 	}
 	,popScene: function() {
-		return this._scenes.pop();
+		var scene = this._scenes.pop();
+		if(this.contains(scene.sprite)) this.removeChild(scene.sprite);
+		return scene;
 	}
 	,get_scene: function() {
 		return this._scene;
 	}
 	,set_scene: function(value) {
 		if(this._scene == value) return value;
-		if(this._scenes.length > 0) this._scenes.pop();
+		if(this._scenes.length > 0) this.popScene();
 		this._scenes.push(value);
 		return this._scene;
 	}
@@ -1871,6 +1872,9 @@ var DefaultAssetLibrary = function() {
 	lime_AssetLibrary.call(this);
 	openfl_text_Font.registerFont(_$_$ASSET_$_$OPENFL_$_$font_$04b_$03_$_$_$ttf);
 	var id;
+	id = "assets/graphics/ball.png";
+	this.path.set(id,id);
+	this.type.set(id,"IMAGE");
 	id = "assets/graphics/bat.png";
 	this.path.set(id,id);
 	this.type.set(id,"IMAGE");
@@ -2024,13 +2028,13 @@ var DefaultAssetLibrary = function() {
 	id = "assets/sounds/glomp.wav";
 	this.path.set(id,id);
 	this.type.set(id,"SOUND");
+	id = "assets/sounds/hit.wav";
+	this.path.set(id,id);
+	this.type.set(id,"SOUND");
 	id = "assets/sounds/sad.wav";
 	this.path.set(id,id);
 	this.type.set(id,"SOUND");
 	id = "assets/sounds/shot.wav";
-	this.path.set(id,id);
-	this.type.set(id,"SOUND");
-	id = "assets/sounds/sword.wav";
 	this.path.set(id,id);
 	this.type.set(id,"SOUND");
 	id = "assets/music/creepy.ogg";
@@ -15532,7 +15536,7 @@ var lime_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 537723;
+	this.version = 646555;
 };
 $hxClasses["lime.AssetCache"] = lime_AssetCache;
 lime_AssetCache.__name__ = ["lime","AssetCache"];
@@ -51865,6 +51869,127 @@ whathaveidone_Sound.toggleMute = function() {
 	whathaveidone_Sound.muted = !whathaveidone_Sound.muted;
 	com_haxepunk_Sfx.setVolume("sfx",whathaveidone_Sound.muted?0:1);
 };
+var whathaveidone_entities_FallingObject = function(type) {
+	com_haxepunk_Entity.call(this);
+	this.set_type(type);
+	this.shadow = new com_haxepunk_graphics_Image(com_haxepunk_HXP.renderMode == com_haxepunk_RenderMode.HARDWARE?(function($this) {
+		var $r;
+		var e = com_haxepunk_ds_Either.Right(com_haxepunk_graphics_atlas_Atlas.loadImageAsRegion((function($this) {
+			var $r;
+			var data = com_haxepunk_graphics_atlas_AtlasData.getAtlasDataByName("assets/graphics/shadow.png",true);
+			$r = data;
+			return $r;
+		}($this))));
+		$r = e;
+		return $r;
+	}(this)):(function($this) {
+		var $r;
+		var e1 = com_haxepunk_ds_Either.Left(com_haxepunk_HXP.getBitmap("assets/graphics/shadow.png"));
+		$r = e1;
+		return $r;
+	}(this)));
+	this.shadow.originX = this.shadow.get_width() / 2;
+	this.shadow.originY = this.shadow.get_height() * 0.75;
+	this.addGraphic(this.shadow);
+	this.obj = new com_haxepunk_graphics_Image((function($this) {
+		var $r;
+		var s = "assets/graphics/" + type + ".png";
+		$r = com_haxepunk_HXP.renderMode == com_haxepunk_RenderMode.HARDWARE?(function($this) {
+			var $r;
+			var e2 = com_haxepunk_ds_Either.Right(com_haxepunk_graphics_atlas_Atlas.loadImageAsRegion((function($this) {
+				var $r;
+				var data1 = com_haxepunk_graphics_atlas_AtlasData.getAtlasDataByName(s,true);
+				$r = data1;
+				return $r;
+			}($this))));
+			$r = e2;
+			return $r;
+		}($this)):(function($this) {
+			var $r;
+			var e3 = com_haxepunk_ds_Either.Left(com_haxepunk_HXP.getBitmap(s));
+			$r = e3;
+			return $r;
+		}($this));
+		return $r;
+	}(this)));
+	this.obj.y = -com_haxepunk_HXP.height;
+	this.obj.originX = this.obj.get_width() / 2;
+	this.obj.originY = this.obj.get_height() * 0.75;
+	this.addGraphic(this.obj);
+	this.set_width(this.obj.get_width());
+	this.set_height(this.obj.get_height());
+	this.originX = Std["int"](this.obj.get_width() / 2);
+	this.originY = Std["int"](this.obj.get_height() * 0.75);
+};
+$hxClasses["whathaveidone.entities.FallingObject"] = whathaveidone_entities_FallingObject;
+whathaveidone_entities_FallingObject.__name__ = ["whathaveidone","entities","FallingObject"];
+whathaveidone_entities_FallingObject.__super__ = com_haxepunk_Entity;
+whathaveidone_entities_FallingObject.prototype = $extend(com_haxepunk_Entity.prototype,{
+	shadow: null
+	,obj: null
+	,update: function() {
+		if(this.obj.y < 0) {
+			this.shadow.set_scale(com_haxepunk_HXP.clamp(1 - -this.obj.y / com_haxepunk_HXP.height,0,1));
+			var _g = this.obj;
+			_g.y = _g.y + com_haxepunk_HXP.height * com_haxepunk_HXP.elapsed / 1.5;
+			if(this.obj.y >= 0) {
+				this.obj.y = 0;
+				this.shadow._visible = false;
+			}
+		}
+		this.set_layer(Std["int"](com_haxepunk_HXP.height * 2 - (this.get_y() + 4)));
+	}
+	,__class__: whathaveidone_entities_FallingObject
+});
+var whathaveidone_entities_Ball = function() {
+	this.dy = 0;
+	this.dx = 0;
+	this.kickTime = 0;
+	whathaveidone_entities_FallingObject.call(this,"ball");
+};
+$hxClasses["whathaveidone.entities.Ball"] = whathaveidone_entities_Ball;
+whathaveidone_entities_Ball.__name__ = ["whathaveidone","entities","Ball"];
+whathaveidone_entities_Ball.__super__ = whathaveidone_entities_FallingObject;
+whathaveidone_entities_Ball.prototype = $extend(whathaveidone_entities_FallingObject.prototype,{
+	kickTime: null
+	,dx: null
+	,dy: null
+	,update: function() {
+		whathaveidone_entities_FallingObject.prototype.update.call(this);
+		if(this.obj.y == 0) {
+			if(this.kickTime > 0) {
+				var _g = this;
+				_g.set_x(_g.get_x() + this.dx * 800 * com_haxepunk_HXP.elapsed);
+				var _g1 = this;
+				_g1.set_y(_g1.get_y() + this.dy * 800 * com_haxepunk_HXP.elapsed);
+				this.kickTime -= com_haxepunk_HXP.elapsed;
+				if(this.kickTime <= 0) this._scene.remove(this);
+			} else {
+				var monster = this.collide("monster",this.get_x(),this.get_y());
+				if(monster != null && monster.behavior != null) {
+					var _g2 = monster.behavior;
+					switch(_g2[1]) {
+					case 1:
+						var y = _g2[3];
+						var x = _g2[2];
+						this.kickTime = 1;
+						this.dx = (this.get_x() - monster.get_x()) * 2;
+						this.dy = this.get_y() - monster.get_y();
+						var dl = Math.sqrt(Math.pow(this.dx,2) + Math.pow(this.dy,2));
+						this.dx /= dl;
+						this.dy /= dl;
+						whathaveidone_Sound.play("hit");
+						com_haxepunk_HXP.screen.shake();
+						monster.makeHappy();
+						break;
+					default:
+					}
+				}
+			}
+		}
+	}
+	,__class__: whathaveidone_entities_Ball
+});
 var whathaveidone_entities_Button = function(iconType,onClick) {
 	com_haxepunk_Entity.call(this);
 	this.set_type("button");
@@ -51957,69 +52082,13 @@ whathaveidone_entities_HeartMeter.prototype = $extend(com_haxepunk_Entity.protot
 });
 var whathaveidone_entities_Meat = function() {
 	this.remaining = 3;
-	com_haxepunk_Entity.call(this);
-	this.set_type("meat");
-	this.shadow = new com_haxepunk_graphics_Image(com_haxepunk_HXP.renderMode == com_haxepunk_RenderMode.HARDWARE?(function($this) {
-		var $r;
-		var e = com_haxepunk_ds_Either.Right(com_haxepunk_graphics_atlas_Atlas.loadImageAsRegion((function($this) {
-			var $r;
-			var data = com_haxepunk_graphics_atlas_AtlasData.getAtlasDataByName("assets/graphics/shadow.png",true);
-			$r = data;
-			return $r;
-		}($this))));
-		$r = e;
-		return $r;
-	}(this)):(function($this) {
-		var $r;
-		var e1 = com_haxepunk_ds_Either.Left(com_haxepunk_HXP.getBitmap("assets/graphics/shadow.png"));
-		$r = e1;
-		return $r;
-	}(this)));
-	this.shadow.originX = this.shadow.get_width() / 2;
-	this.shadow.originY = this.shadow.get_height() * 0.75;
-	this.addGraphic(this.shadow);
-	this.meat = new com_haxepunk_graphics_Image(com_haxepunk_HXP.renderMode == com_haxepunk_RenderMode.HARDWARE?(function($this) {
-		var $r;
-		var e2 = com_haxepunk_ds_Either.Right(com_haxepunk_graphics_atlas_Atlas.loadImageAsRegion((function($this) {
-			var $r;
-			var data1 = com_haxepunk_graphics_atlas_AtlasData.getAtlasDataByName("assets/graphics/meat.png",true);
-			$r = data1;
-			return $r;
-		}($this))));
-		$r = e2;
-		return $r;
-	}(this)):(function($this) {
-		var $r;
-		var e3 = com_haxepunk_ds_Either.Left(com_haxepunk_HXP.getBitmap("assets/graphics/meat.png"));
-		$r = e3;
-		return $r;
-	}(this)));
-	this.meat.y = -com_haxepunk_HXP.height;
-	this.meat.originX = this.meat.get_width() / 2;
-	this.meat.originY = this.meat.get_height() * 0.75;
-	this.addGraphic(this.meat);
-	this.set_width(this.meat.get_width());
-	this.set_height(this.meat.get_height());
+	whathaveidone_entities_FallingObject.call(this,"meat");
 };
 $hxClasses["whathaveidone.entities.Meat"] = whathaveidone_entities_Meat;
 whathaveidone_entities_Meat.__name__ = ["whathaveidone","entities","Meat"];
-whathaveidone_entities_Meat.__super__ = com_haxepunk_Entity;
-whathaveidone_entities_Meat.prototype = $extend(com_haxepunk_Entity.prototype,{
+whathaveidone_entities_Meat.__super__ = whathaveidone_entities_FallingObject;
+whathaveidone_entities_Meat.prototype = $extend(whathaveidone_entities_FallingObject.prototype,{
 	remaining: null
-	,shadow: null
-	,meat: null
-	,update: function() {
-		if(this.meat.y < 0) {
-			this.shadow.set_scale(com_haxepunk_HXP.clamp(1 - -this.meat.y / com_haxepunk_HXP.height,0,1));
-			var _g = this.meat;
-			_g.y = _g.y + com_haxepunk_HXP.height * com_haxepunk_HXP.elapsed / 1.5;
-			if(this.meat.y >= 0) {
-				this.meat.y = 0;
-				this.shadow._visible = false;
-			}
-		}
-		this.set_layer(Std["int"](com_haxepunk_HXP.height * 2 - (this.get_y() + 4)));
-	}
 	,eat: function() {
 		var finished = --this.remaining <= 0;
 		if(finished) this._scene.remove(this);
@@ -52069,6 +52138,9 @@ var whathaveidone_entities_Monster = function() {
 	this.emitter.setAlpha("dust");
 	this.emitter.setGravity("dust",2,4);
 	(js_Boot.__cast(this._graphic , com_haxepunk_graphics_Graphiclist)).add(this.emitter);
+	this.set_type("monster");
+	this.set_width(this.set_height(64));
+	this.originX = this.originY = Std["int"](this.get_width() / 2);
 };
 $hxClasses["whathaveidone.entities.Monster"] = whathaveidone_entities_Monster;
 whathaveidone_entities_Monster.__name__ = ["whathaveidone","entities","Monster"];
@@ -52109,9 +52181,9 @@ whathaveidone_entities_Monster.prototype = $extend(com_haxepunk_Entity.prototype
 			return 1;
 		}
 	}
+	,behavior: null
 	,emitter: null
 	,bubble: null
-	,behavior: null
 	,sickCount: null
 	,cracks: null
 	,pooProgress: null
@@ -52199,7 +52271,7 @@ whathaveidone_entities_Monster.prototype = $extend(com_haxepunk_Entity.prototype
 			if(poo1 != null) satisfied = false;
 		}
 		if(this.level < 4) {
-			this.happy += (satisfied?1:-0.5) * (0.25 * com_haxepunk_HXP.elapsed / 7.5);
+			this.happy += (satisfied?1:-2) * (0.25 * com_haxepunk_HXP.elapsed / 15);
 			this.happy = com_haxepunk_HXP.clamp(this.happy,0,1);
 			this.avgHappiness += this.happy * (com_haxepunk_HXP.elapsed / this.get_timeToEvolve());
 		}
@@ -52208,6 +52280,10 @@ whathaveidone_entities_Monster.prototype = $extend(com_haxepunk_Entity.prototype
 	,hit: function() {
 		this.health -= 0.25;
 		if(this.health <= 0.0001) this.health = 0;
+	}
+	,makeHappy: function() {
+		this.happy += 0.25;
+		if(this.health > 1) this.health = 1;
 	}
 	,randomX: function() {
 		return whathaveidone_entities_Monster.randomPosition(whathaveidone_Client.monsterBounds.x,whathaveidone_Client.monsterBounds.width,this.get_x());
@@ -52244,6 +52320,11 @@ whathaveidone_entities_Monster.prototype = $extend(com_haxepunk_Entity.prototype
 		}
 	}
 	,evolve: function() {
+		if(this.bubble != null) {
+			var gl = this._graphic;
+			gl.remove(this.bubble);
+			this.bubble = null;
+		}
 		whathaveidone_Sound.play("evolve");
 		var _g = 0;
 		while(_g < 32) {
@@ -52288,12 +52369,19 @@ whathaveidone_entities_Monster.prototype = $extend(com_haxepunk_Entity.prototype
 		}
 		if(whathaveidone_Defs.hearts(this.hungry) < 4) {
 			var meat = this.findMeat();
-			if(meat != null) return whathaveidone_MonsterBehavior.Eat(meat); else if(this.hungry < 0.4) return whathaveidone_MonsterBehavior.Want(4,4);
+			if(meat != null) return whathaveidone_MonsterBehavior.Eat(meat); else if(this.hungry <= 0.25) return whathaveidone_MonsterBehavior.Want(4,4);
+		}
+		if(this.level < 3) {
+			var ball = this.findBall();
+			if(ball != null && ball.kickTime == 0) return whathaveidone_MonsterBehavior.Move(ball.get_x(),ball.get_y()); else if(this.happy <= 0.25) return whathaveidone_MonsterBehavior.Want(8,2);
 		}
 		if(Math.random() < 0.5) return whathaveidone_MonsterBehavior.Idle(1 + Math.random() * 4); else return whathaveidone_MonsterBehavior.Move(this.randomX(),this.randomY());
 	}
 	,findMeat: function() {
 		return this._scene.collideRect("meat",0,0,com_haxepunk_HXP.width,com_haxepunk_HXP.height);
+	}
+	,findBall: function() {
+		return this._scene.collideRect("ball",0,0,com_haxepunk_HXP.width,com_haxepunk_HXP.height);
 	}
 	,findPoo: function() {
 		return this._scene.collideRect("poo",0,0,com_haxepunk_HXP.width,com_haxepunk_HXP.height);
@@ -52307,7 +52395,7 @@ whathaveidone_entities_Monster.prototype = $extend(com_haxepunk_Entity.prototype
 				if(this.spine.currentAnimation == "eat" && meat.eat()) {
 					this.hungry += 0.25;
 					if(this.hungry > 1) this.hungry = 1;
-					this.behavior = null;
+					this.behavior = whathaveidone_MonsterBehavior.Idle(1);
 					++this.pooProgress;
 					if(this.level < 4) {
 						var sickChance;
@@ -52429,7 +52517,7 @@ whathaveidone_entities_Sword.prototype = $extend(com_haxepunk_Entity.prototype,{
 	}
 	,onHit: function(trackEntry,event) {
 		if(this.monster.spine.currentAnimation == "eat") {
-			whathaveidone_Sound.play("sword");
+			whathaveidone_Sound.play("hit");
 			com_haxepunk_HXP.screen.shake();
 			this.flash.flash();
 			this.monster.hit();
@@ -52616,11 +52704,7 @@ whathaveidone_scenes_GameOverScene.prototype = $extend(com_haxepunk_Scene.protot
 			this.clickBuffer -= com_haxepunk_HXP.elapsed / 5;
 			if(this.clickBuffer < 0) this.clickBuffer = 0;
 			this.txt.set_alpha(this.img.set_alpha(1 - this.clickBuffer));
-		} else if(com_haxepunk_utils_Input.mousePressed) {
-			com_haxepunk_HXP.engine.popScene();
-			com_haxepunk_HXP.engine.popScene();
-			com_haxepunk_HXP.engine.pushScene(new whathaveidone_scenes_GameScene());
-		}
+		} else if(com_haxepunk_utils_Input.mousePressed) com_haxepunk_HXP.set_scene(new whathaveidone_scenes_GameScene());
 	}
 	,__class__: whathaveidone_scenes_GameOverScene
 });
@@ -52665,15 +52749,19 @@ var whathaveidone_scenes_GameScene = function() {
 	this.foodButton.set_y(8);
 	this.foodButton.set_x(com_haxepunk_HXP.width - 8 - this.foodButton.get_width());
 	this.add(this.foodButton);
+	this.ballButton = new whathaveidone_entities_Button(8,$bind(this,this.pressBall));
+	this.ballButton.set_y(this.foodButton.get_y() + this.foodButton.get_height() + 8);
+	this.ballButton.set_x(com_haxepunk_HXP.width - 8 - this.foodButton.get_width());
+	this.add(this.ballButton);
 	this.duckButton = new whathaveidone_entities_Button(5,$bind(this,this.pressDuck));
-	this.duckButton.set_y(this.foodButton.get_y() + this.foodButton.get_height() + 8);
+	this.duckButton.set_y(this.ballButton.get_y() + this.ballButton.get_height() + 8);
 	this.duckButton.set_x(this.foodButton.get_x());
 	this.add(this.duckButton);
 	this.shotButton = new whathaveidone_entities_Button(6,$bind(this,this.pressShot));
 	this.shotButton.set_y(this.duckButton.get_y() + this.duckButton.get_height() + 8);
 	this.shotButton.set_x(this.foodButton.get_x());
 	this.add(this.shotButton);
-	var muteButton = new whathaveidone_entities_Button(8,$bind(this,this.pressMute));
+	var muteButton = new whathaveidone_entities_Button(9,$bind(this,this.pressMute));
 	muteButton.set_y(com_haxepunk_HXP.height - this.foodButton.get_y() - muteButton.get_height());
 	muteButton.set_x(this.foodButton.get_x());
 	this.add(muteButton);
@@ -52689,6 +52777,7 @@ whathaveidone_scenes_GameScene.prototype = $extend(com_haxepunk_Scene.prototype,
 	,progressMeter: null
 	,healthMeter: null
 	,foodButton: null
+	,ballButton: null
 	,duckButton: null
 	,shotButton: null
 	,switchedButtons: null
@@ -52703,6 +52792,7 @@ whathaveidone_scenes_GameScene.prototype = $extend(com_haxepunk_Scene.prototype,
 	,update: function() {
 		com_haxepunk_Scene.prototype.update.call(this);
 		if(!this.switchedButtons && this.monster.level == 4) {
+			this.remove(this.ballButton);
 			this.remove(this.shotButton);
 			var swordButton = new whathaveidone_entities_Button(7,$bind(this,this.pressSword));
 			swordButton.set_y(this.shotButton.get_y());
@@ -52716,7 +52806,7 @@ whathaveidone_scenes_GameScene.prototype = $extend(com_haxepunk_Scene.prototype,
 			this.healthMeter.set_y(this.happyMeter.get_y());
 			this.add(this.healthMeter);
 		}
-		if(this.monster.health <= 0) com_haxepunk_HXP.engine.pushScene(new whathaveidone_scenes_GameOverScene());
+		if(this.monster.health <= 0) com_haxepunk_HXP.set_scene(new whathaveidone_scenes_GameOverScene());
 	}
 	,pressFeed: function() {
 		var meat = this.collideRect("meat",0,0,com_haxepunk_HXP.width,com_haxepunk_HXP.height);
@@ -52726,6 +52816,16 @@ whathaveidone_scenes_GameScene.prototype = $extend(com_haxepunk_Scene.prototype,
 			meat.set_x(this.monster.randomX());
 			meat.set_y(this.monster.randomY());
 			this.add(meat);
+		}
+	}
+	,pressBall: function() {
+		var ball = this.collideRect("ball",0,0,com_haxepunk_HXP.width,com_haxepunk_HXP.height);
+		if(ball == null) {
+			whathaveidone_Sound.play("give");
+			ball = new whathaveidone_entities_Ball();
+			ball.set_x(this.monster.randomX());
+			ball.set_y(this.monster.randomY());
+			this.add(ball);
 		}
 	}
 	,pressDuck: function() {
@@ -54550,21 +54650,22 @@ spinepunk_SpinePunk.atlasDataMap = new haxe_ds_ObjectMap();
 spinepunk_SpinePunk.p = new openfl_geom_Point();
 whathaveidone_Client.WIDTH = 800;
 whathaveidone_Client.HEIGHT = 480;
-whathaveidone_Client.monsterBounds = new openfl_geom_Rectangle(150,310,600,150);
+whathaveidone_Client.monsterBounds = new openfl_geom_Rectangle(150,320,600,150);
 whathaveidone_Defs.HEARTS = 4;
 whathaveidone_Defs.MIN_HEARTS = 2.5;
 whathaveidone_Music.loaded = new haxe_ds_StringMap();
 whathaveidone_Music.muted = false;
 whathaveidone_Sound.loaded = new haxe_ds_StringMap();
 whathaveidone_Sound.muted = false;
+whathaveidone_entities_FallingObject.FALL_TIME = 1.5;
+whathaveidone_entities_Ball.DISTANCE_PER_SECOND = 800;
 whathaveidone_entities_Button.ACTIVE_COLOR = 16777215;
 whathaveidone_entities_Button.INACTIVE_COLOR = 12632256;
-whathaveidone_entities_Meat.FALL_TIME = 1.5;
 whathaveidone_entities_Meat.GLOMPS = 3;
 whathaveidone_entities_Monster.MAX_LEVEL = 4;
 whathaveidone_entities_Monster.MOVE_PER_SECOND = 128;
 whathaveidone_entities_Monster.HUNGRY_HEART_SECONDS = 30;
-whathaveidone_entities_Monster.HAPPY_HEART_SECONDS = 7.5;
+whathaveidone_entities_Monster.HAPPY_HEART_SECONDS = 15;
 whathaveidone_entities_Monster.MEAT_TO_POO = 3;
 whathaveidone_entities_Monster.SICK_CHANCE = 0.05;
 whathaveidone_entities_Monster.POO_SICK_CHANCE = 1;
