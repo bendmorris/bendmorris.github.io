@@ -1584,9 +1584,15 @@ com_haxepunk_Engine.prototype = $extend(openfl_display_Sprite.prototype,{
 		com_haxepunk_utils_Draw.resetTarget();
 		if(this._scenes.length > 0) {
 			var visibleScene = this._scenes.length - 1;
-			while(this._scenes[visibleScene].transparent && visibleScene > 0) --visibleScene;
+			while(this._scenes[visibleScene].alpha < 1 && visibleScene > 0) --visibleScene;
+			var _g = 0;
+			while(_g < visibleScene) {
+				var i = _g++;
+				this._scenes[i]._drawn = false;
+			}
 			while(visibleScene < this._scenes.length) {
 				var scene = this._scenes[visibleScene++];
+				scene._drawn = true;
 				if(scene.visible) scene.render();
 			}
 		}
@@ -5803,9 +5809,11 @@ com_haxepunk_RenderMode.HARDWARE = ["HARDWARE",1];
 com_haxepunk_RenderMode.HARDWARE.toString = $estr;
 com_haxepunk_RenderMode.HARDWARE.__enum__ = com_haxepunk_RenderMode;
 var com_haxepunk_Scene = function() {
+	this._drawn = false;
 	this.height = 0;
 	this.width = 0;
-	this.transparent = false;
+	this.alpha = 1;
+	this.color = null;
 	com_haxepunk_Tweener.call(this);
 	this.visible = true;
 	this.camera = new openfl_geom_Point();
@@ -5861,7 +5869,8 @@ com_haxepunk_Scene.squarePointRect = function(px,py,rx,ry,rw,rh) {
 com_haxepunk_Scene.__super__ = com_haxepunk_Tweener;
 com_haxepunk_Scene.prototype = $extend(com_haxepunk_Tweener.prototype,{
 	visible: null
-	,transparent: null
+	,color: null
+	,alpha: null
 	,camera: null
 	,width: null
 	,height: null
@@ -6620,6 +6629,7 @@ com_haxepunk_Scene.prototype = $extend(com_haxepunk_Tweener.prototype,{
 	,_types: null
 	,_recycled: null
 	,_entityNames: null
+	,_drawn: null
 	,__class__: com_haxepunk_Scene
 	,__properties__: $extend(com_haxepunk_Tweener.prototype.__properties__,{get_uniqueTypes:"get_uniqueTypes",get_layerNearest:"get_layerNearest",get_layerFarthest:"get_layerFarthest",get_nearest:"get_nearest",get_farthest:"get_farthest",get_layers:"get_layers",get_first:"get_first",get_count:"get_count",get_mouseY:"get_mouseY",get_mouseX:"get_mouseX"})
 });
@@ -11142,10 +11152,20 @@ com_haxepunk_graphics_atlas_DrawCommand.prototype = {
 		++this.dataCount;
 	}
 	,addRect: function(rx,ry,rw,rh,a,b,c,d,tx,ty,red,green,blue,alpha) {
-		var uvx1 = rx / this.texture.width;
-		var uvy1 = ry / this.texture.height;
-		var uvx2 = (rx + rw) / this.texture.width;
-		var uvy2 = (ry + rh) / this.texture.height;
+		var uvx1;
+		var uvy1;
+		var uvx2;
+		var uvy2;
+		if(this.texture == null) {
+			uvx1 = uvy1 = 0;
+			uvx2 = rw;
+			uvy2 = rh;
+		} else {
+			uvx1 = rx / this.texture.width;
+			uvy1 = ry / this.texture.height;
+			uvx2 = (rx + rw) / this.texture.width;
+			uvy2 = (ry + rh) / this.texture.height;
+		}
 		var matrix = com_haxepunk_HXP.matrix;
 		matrix.setTo(a,b,c,d,tx,ty);
 		this.addTriangle(0 * matrix.a + 0 * matrix.c + matrix.tx,0 * matrix.b + 0 * matrix.d + matrix.ty,uvx1,uvy1,rw * matrix.a + 0 * matrix.c + matrix.tx,rw * matrix.b + 0 * matrix.d + matrix.ty,uvx2,uvy1,0 * matrix.a + rh * matrix.c + matrix.tx,0 * matrix.b + rh * matrix.d + matrix.ty,uvx1,uvy2,red,green,blue,alpha);
@@ -11199,13 +11219,14 @@ com_haxepunk_graphics_atlas_DrawCommand.prototype = {
 	,_next: null
 	,__class__: com_haxepunk_graphics_atlas_DrawCommand
 };
-var com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader = function() {
+var com_haxepunk_graphics_atlas__$HardwareRenderer_Shader = function(vertexSource,fragmentSource) {
+	this.bufferChunkSize = 0;
 	var vertexShader = lime_graphics_opengl_GL.context.createShader(35633);
-	lime_graphics_opengl_GL.context.shaderSource(vertexShader,"// HaxePunk HardwareRenderer vertex shader\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nattribute vec4 aPosition;\nattribute vec2 aTexCoord;\nattribute vec4 aColor;\nvarying vec2 vTexCoord;\nvarying vec4 vColor;\nuniform mat4 uMatrix;\n\nvoid main(void) {\n\tvTexCoord = aTexCoord;\n\tvColor = aColor;\n\tgl_Position = uMatrix * aPosition;\n}");
+	lime_graphics_opengl_GL.context.shaderSource(vertexShader,vertexSource);
 	lime_graphics_opengl_GL.context.compileShader(vertexShader);
 	if(lime_graphics_opengl_GL.context.getShaderParameter(vertexShader,35713) == 0) throw new js__$Boot_HaxeError("Error compiling vertex shader: " + lime_graphics_opengl_GL.context.getShaderInfoLog(vertexShader));
 	var fragmentShader = lime_graphics_opengl_GL.context.createShader(35632);
-	lime_graphics_opengl_GL.context.shaderSource(fragmentShader,"// HaxePunk HardwareRenderer fragment shader\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nvarying vec2 vTexCoord;\nvarying vec4 vColor;\nuniform sampler2D uImage0;\n\nvoid main(void) {\n\tvec4 color = texture2D(uImage0, vTexCoord);\n\tif (color.a == 0.0) {\n\t\tgl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\n\t} else {\n\t\tgl_FragColor = vec4(color.rgb / color.a, color.a) * vColor;\n\t}\n}");
+	lime_graphics_opengl_GL.context.shaderSource(fragmentShader,fragmentSource);
 	lime_graphics_opengl_GL.context.compileShader(fragmentShader);
 	if(lime_graphics_opengl_GL.context.getShaderParameter(fragmentShader,35713) == 0) throw new js__$Boot_HaxeError("Error compiling fragment shader: " + lime_graphics_opengl_GL.context.getShaderInfoLog(fragmentShader));
 	this.glProgram = lime_graphics_opengl_GL.context.createProgram();
@@ -11214,22 +11235,17 @@ var com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader = function() {
 	lime_graphics_opengl_GL.context.linkProgram(this.glProgram);
 	if(lime_graphics_opengl_GL.context.getProgramParameter(this.glProgram,35714) == 0) throw new js__$Boot_HaxeError("Unable to initialize the shader program.");
 };
-$hxClasses["com.haxepunk.graphics.atlas._HardwareRenderer.TextureShader"] = com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader;
-com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader.__name__ = ["com","haxepunk","graphics","atlas","_HardwareRenderer","TextureShader"];
-com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader.prototype = {
+$hxClasses["com.haxepunk.graphics.atlas._HardwareRenderer.Shader"] = com_haxepunk_graphics_atlas__$HardwareRenderer_Shader;
+com_haxepunk_graphics_atlas__$HardwareRenderer_Shader.__name__ = ["com","haxepunk","graphics","atlas","_HardwareRenderer","Shader"];
+com_haxepunk_graphics_atlas__$HardwareRenderer_Shader.prototype = {
 	glProgram: null
+	,bufferChunkSize: null
 	,bind: function() {
 		lime_graphics_opengl_GL.useProgram(this.glProgram);
-		lime_graphics_opengl_GL.enableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,"aPosition"));
-		lime_graphics_opengl_GL.enableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,"aTexCoord"));
-		lime_graphics_opengl_GL.enableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,"aColor"));
 	}
 	,unbind: function() {
 		lime_graphics_opengl_GL.__currentProgram = null;
 		lime_graphics_opengl_GL.context.useProgram(null);
-		lime_graphics_opengl_GL.disableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,"aPosition"));
-		lime_graphics_opengl_GL.disableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,"aTexCoord"));
-		lime_graphics_opengl_GL.disableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,"aColor"));
 	}
 	,attributeIndex: function(name) {
 		return lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,name);
@@ -11237,8 +11253,50 @@ com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader.prototype = {
 	,uniformIndex: function(name) {
 		return lime_graphics_opengl_GL.context.getUniformLocation(this.glProgram,name);
 	}
-	,__class__: com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader
+	,__class__: com_haxepunk_graphics_atlas__$HardwareRenderer_Shader
 };
+var com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader = function() {
+	com_haxepunk_graphics_atlas__$HardwareRenderer_Shader.call(this,"// HaxePunk HardwareRenderer texture vertex shader\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nattribute vec4 aPosition;\nattribute vec4 aColor;\nattribute vec2 aTexCoord;\nvarying vec2 vTexCoord;\nvarying vec4 vColor;\nuniform mat4 uMatrix;\n\nvoid main(void) {\n\tvColor = aColor;\n\tvTexCoord = aTexCoord;\n\tgl_Position = uMatrix * aPosition;\n}","// HaxePunk HardwareRenderer texture fragment shader\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nvarying vec4 vColor;\nvarying vec2 vTexCoord;\nuniform sampler2D uImage0;\n\nvoid main(void) {\n\tvec4 color = texture2D(uImage0, vTexCoord);\n\tif (color.a == 0.0) {\n\t\tgl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\n\t} else {\n\t\tgl_FragColor = vec4(color.rgb / color.a, color.a) * vColor;\n\t}\n}");
+	this.bufferChunkSize = 8;
+};
+$hxClasses["com.haxepunk.graphics.atlas._HardwareRenderer.TextureShader"] = com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader;
+com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader.__name__ = ["com","haxepunk","graphics","atlas","_HardwareRenderer","TextureShader"];
+com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader.__super__ = com_haxepunk_graphics_atlas__$HardwareRenderer_Shader;
+com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader.prototype = $extend(com_haxepunk_graphics_atlas__$HardwareRenderer_Shader.prototype,{
+	bind: function() {
+		com_haxepunk_graphics_atlas__$HardwareRenderer_Shader.prototype.bind.call(this);
+		lime_graphics_opengl_GL.enableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,"aPosition"));
+		lime_graphics_opengl_GL.enableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,"aTexCoord"));
+		lime_graphics_opengl_GL.enableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,"aColor"));
+	}
+	,unbind: function() {
+		com_haxepunk_graphics_atlas__$HardwareRenderer_Shader.prototype.unbind.call(this);
+		lime_graphics_opengl_GL.disableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,"aPosition"));
+		lime_graphics_opengl_GL.disableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,"aTexCoord"));
+		lime_graphics_opengl_GL.disableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,"aColor"));
+	}
+	,__class__: com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader
+});
+var com_haxepunk_graphics_atlas__$HardwareRenderer_ColorShader = function() {
+	com_haxepunk_graphics_atlas__$HardwareRenderer_Shader.call(this,"// HaxePunk HardwareRenderer color vertex shader\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nattribute vec4 aPosition;\nattribute vec4 aColor;\nvarying vec4 vColor;\nuniform mat4 uMatrix;\n\nvoid main(void) {\n\tvColor = aColor;\n\tgl_Position = uMatrix * aPosition;\n}","// HaxePunk HardwareRenderer color fragment shader\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nvarying vec4 vColor;\n\nvoid main(void) {\n\tgl_FragColor = clamp(vColor, 0.0, 1.0);\n\t//gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n}");
+	this.bufferChunkSize = 6;
+};
+$hxClasses["com.haxepunk.graphics.atlas._HardwareRenderer.ColorShader"] = com_haxepunk_graphics_atlas__$HardwareRenderer_ColorShader;
+com_haxepunk_graphics_atlas__$HardwareRenderer_ColorShader.__name__ = ["com","haxepunk","graphics","atlas","_HardwareRenderer","ColorShader"];
+com_haxepunk_graphics_atlas__$HardwareRenderer_ColorShader.__super__ = com_haxepunk_graphics_atlas__$HardwareRenderer_Shader;
+com_haxepunk_graphics_atlas__$HardwareRenderer_ColorShader.prototype = $extend(com_haxepunk_graphics_atlas__$HardwareRenderer_Shader.prototype,{
+	bind: function() {
+		com_haxepunk_graphics_atlas__$HardwareRenderer_Shader.prototype.bind.call(this);
+		lime_graphics_opengl_GL.enableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,"aPosition"));
+		lime_graphics_opengl_GL.enableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,"aColor"));
+	}
+	,unbind: function() {
+		com_haxepunk_graphics_atlas__$HardwareRenderer_Shader.prototype.unbind.call(this);
+		lime_graphics_opengl_GL.disableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,"aPosition"));
+		lime_graphics_opengl_GL.disableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(this.glProgram,"aColor"));
+	}
+	,__class__: com_haxepunk_graphics_atlas__$HardwareRenderer_ColorShader
+});
 var com_haxepunk_graphics_atlas_HardwareRenderer = function() { };
 $hxClasses["com.haxepunk.graphics.atlas.HardwareRenderer"] = com_haxepunk_graphics_atlas_HardwareRenderer;
 com_haxepunk_graphics_atlas_HardwareRenderer.__name__ = ["com","haxepunk","graphics","atlas","HardwareRenderer"];
@@ -11246,13 +11304,13 @@ com_haxepunk_graphics_atlas_HardwareRenderer.resize = function(length,minChunks,
 	return Std["int"](Math.max(length * 2 / chunkSize | 0,minChunks) * chunkSize);
 };
 com_haxepunk_graphics_atlas_HardwareRenderer.render = function(drawCommand,scene,rect) {
+	if(com_haxepunk_graphics_atlas_HardwareRenderer.colorShader == null) com_haxepunk_graphics_atlas_HardwareRenderer.colorShader = new com_haxepunk_graphics_atlas__$HardwareRenderer_ColorShader();
+	if(com_haxepunk_graphics_atlas_HardwareRenderer.textureShader == null) com_haxepunk_graphics_atlas_HardwareRenderer.textureShader = new com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader();
 	if(drawCommand != null && drawCommand.dataCount > 0) {
-		if(com_haxepunk_graphics_atlas_HardwareRenderer.textureShader == null) com_haxepunk_graphics_atlas_HardwareRenderer.textureShader = new com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader();
-		var shader = com_haxepunk_graphics_atlas_HardwareRenderer.textureShader;
-		lime_graphics_opengl_GL.useProgram(shader.glProgram);
-		lime_graphics_opengl_GL.enableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(shader.glProgram,"aPosition"));
-		lime_graphics_opengl_GL.enableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(shader.glProgram,"aTexCoord"));
-		lime_graphics_opengl_GL.enableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(shader.glProgram,"aColor"));
+		var shader;
+		if(drawCommand.texture == null) shader = com_haxepunk_graphics_atlas_HardwareRenderer.colorShader; else shader = com_haxepunk_graphics_atlas_HardwareRenderer.textureShader;
+		shader.bind();
+		var bufferChunkSize = shader.bufferChunkSize;
 		var blend = drawCommand.blend;
 		var smooth = drawCommand.smooth;
 		var tx;
@@ -11277,8 +11335,8 @@ com_haxepunk_graphics_atlas_HardwareRenderer.render = function(drawCommand,scene
 		var bufferLength;
 		if(com_haxepunk_graphics_atlas_HardwareRenderer.buffer == null) bufferLength = 0; else bufferLength = com_haxepunk_graphics_atlas_HardwareRenderer.buffer.length;
 		var items = drawCommand.dataCount;
-		if(bufferLength < items * 24) {
-			var elements = Std["int"](Math.max(bufferLength * 2 / 24 | 0,items) * 24);
+		if(bufferLength < items * bufferChunkSize * 3) {
+			var elements = com_haxepunk_graphics_atlas_HardwareRenderer.resize(bufferLength,items,bufferChunkSize * 3);
 			var this1;
 			if(elements != null) this1 = new Float32Array(elements); else this1 = null;
 			com_haxepunk_graphics_atlas_HardwareRenderer.buffer = this1;
@@ -11297,49 +11355,55 @@ com_haxepunk_graphics_atlas_HardwareRenderer.render = function(drawCommand,scene
 			var idx1 = bufferPos++;
 			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx1] = data.ty1;
 			var idx2 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx2] = data.rx1;
+			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx2] = data.red;
 			var idx3 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx3] = data.ry1;
+			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx3] = data.green;
 			var idx4 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx4] = data.red;
+			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx4] = data.blue;
 			var idx5 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx5] = data.green;
-			var idx6 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx6] = data.blue;
-			var idx7 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx7] = data.alpha;
+			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx5] = data.alpha;
+			if(texture != null) {
+				var idx6 = bufferPos++;
+				com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx6] = data.rx1;
+				var idx7 = bufferPos++;
+				com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx7] = data.ry1;
+			}
 			var idx8 = bufferPos++;
 			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx8] = data.tx2;
 			var idx9 = bufferPos++;
 			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx9] = data.ty2;
 			var idx10 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx10] = data.rx2;
+			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx10] = data.red;
 			var idx11 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx11] = data.ry2;
+			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx11] = data.green;
 			var idx12 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx12] = data.red;
+			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx12] = data.blue;
 			var idx13 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx13] = data.green;
-			var idx14 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx14] = data.blue;
-			var idx15 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx15] = data.alpha;
+			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx13] = data.alpha;
+			if(texture != null) {
+				var idx14 = bufferPos++;
+				com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx14] = data.rx2;
+				var idx15 = bufferPos++;
+				com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx15] = data.ry2;
+			}
 			var idx16 = bufferPos++;
 			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx16] = data.tx3;
 			var idx17 = bufferPos++;
 			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx17] = data.ty3;
 			var idx18 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx18] = data.rx3;
+			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx18] = data.red;
 			var idx19 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx19] = data.ry3;
+			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx19] = data.green;
 			var idx20 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx20] = data.red;
+			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx20] = data.blue;
 			var idx21 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx21] = data.green;
-			var idx22 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx22] = data.blue;
-			var idx23 = bufferPos++;
-			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx23] = data.alpha;
+			com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx21] = data.alpha;
+			if(texture != null) {
+				var idx22 = bufferPos++;
+				com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx22] = data.rx3;
+				var idx23 = bufferPos++;
+				com_haxepunk_graphics_atlas_HardwareRenderer.buffer[idx23] = data.ry3;
+			}
 			data = data._next;
 			dataCount++;
 		}
@@ -11347,15 +11411,17 @@ com_haxepunk_graphics_atlas_HardwareRenderer.render = function(drawCommand,scene
 		var y01 = com_haxepunk_HXP.screen.y + rect.y;
 		var transformation = com_haxepunk_graphics_atlas_HardwareRenderer.ortho(-x01,-x01 + com_haxepunk_HXP.stage.stageWidth,-y01 + com_haxepunk_HXP.stage.stageHeight,-y01,1000,-1000);
 		lime_graphics_opengl_GL.uniformMatrix4fv(lime_graphics_opengl_GL.context.getUniformLocation(shader.glProgram,"uMatrix"),false,transformation);
-		var renderer = com_haxepunk_HXP.stage.__renderer;
-		var renderSession = renderer.renderSession;
-		lime_graphics_opengl_GL.bindTexture(3553,texture.getTexture(renderSession.gl));
-		if(smooth) {
-			lime_graphics_opengl_GL.context.texParameteri(3553,10241,9729);
-			lime_graphics_opengl_GL.context.texParameteri(3553,10240,9729);
-		} else {
-			lime_graphics_opengl_GL.context.texParameteri(3553,10241,9728);
-			lime_graphics_opengl_GL.context.texParameteri(3553,10240,9728);
+		if(texture != null) {
+			var renderer = com_haxepunk_HXP.stage.__renderer;
+			var renderSession = renderer.renderSession;
+			lime_graphics_opengl_GL.bindTexture(3553,texture.getTexture(renderSession.gl));
+			if(smooth) {
+				lime_graphics_opengl_GL.context.texParameteri(3553,10241,9729);
+				lime_graphics_opengl_GL.context.texParameteri(3553,10240,9729);
+			} else {
+				lime_graphics_opengl_GL.context.texParameteri(3553,10241,9728);
+				lime_graphics_opengl_GL.context.texParameteri(3553,10240,9728);
+			}
 		}
 		lime_graphics_opengl_GL.context.bindBuffer(34962,com_haxepunk_graphics_atlas_HardwareRenderer.glBuffer);
 		lime_graphics_opengl_GL.context.bufferSubData(34962,0,com_haxepunk_graphics_atlas_HardwareRenderer.buffer);
@@ -11381,25 +11447,22 @@ com_haxepunk_graphics_atlas_HardwareRenderer.render = function(drawCommand,scene
 			lime_graphics_opengl_GL.context.blendEquation(32774);
 			lime_graphics_opengl_GL.context.blendFunc(770,771);
 		}
-		lime_graphics_opengl_GL.vertexAttribPointer(lime_graphics_opengl_GL.context.getAttribLocation(shader.glProgram,"aPosition"),2,5126,false,32,0);
-		lime_graphics_opengl_GL.vertexAttribPointer(lime_graphics_opengl_GL.context.getAttribLocation(shader.glProgram,"aTexCoord"),2,5126,false,32,8);
-		lime_graphics_opengl_GL.vertexAttribPointer(lime_graphics_opengl_GL.context.getAttribLocation(shader.glProgram,"aColor"),4,5126,false,32,16);
+		var stride = bufferChunkSize * 4;
+		lime_graphics_opengl_GL.vertexAttribPointer(lime_graphics_opengl_GL.context.getAttribLocation(shader.glProgram,"aPosition"),2,5126,false,stride,0);
+		lime_graphics_opengl_GL.vertexAttribPointer(lime_graphics_opengl_GL.context.getAttribLocation(shader.glProgram,"aColor"),4,5126,false,stride,8);
+		if(texture != null) lime_graphics_opengl_GL.vertexAttribPointer(lime_graphics_opengl_GL.context.getAttribLocation(shader.glProgram,"aTexCoord"),2,5126,false,stride,24);
 		lime_graphics_opengl_GL.context.scissor(x01 | 0,com_haxepunk_HXP.stage.stageHeight - y01 - rect.height | 0,rect.width | 0,rect.height | 0);
 		lime_graphics_opengl_GL.context.enable(3089);
 		lime_graphics_opengl_GL.context.drawArrays(4,0,items * 3);
 		lime_graphics_opengl_GL.context.disable(3089);
 		lime_graphics_opengl_GL.context.bindBuffer(34962,null);
-		lime_graphics_opengl_GL.__currentProgram = null;
-		lime_graphics_opengl_GL.context.useProgram(null);
-		lime_graphics_opengl_GL.disableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(shader.glProgram,"aPosition"));
-		lime_graphics_opengl_GL.disableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(shader.glProgram,"aTexCoord"));
-		lime_graphics_opengl_GL.disableVertexAttribArray(lime_graphics_opengl_GL.context.getAttribLocation(shader.glProgram,"aColor"));
+		shader.unbind();
 	}
 	com_haxepunk_graphics_atlas_HardwareRenderer.checkForGLErrors();
 };
 com_haxepunk_graphics_atlas_HardwareRenderer.checkForGLErrors = function() {
 	var error = lime_graphics_opengl_GL.context.getError();
-	if(error != 0) haxe_Log.trace("GL Error: " + error,{ fileName : "HardwareRenderer.hx", lineNumber : 281, className : "com.haxepunk.graphics.atlas.HardwareRenderer", methodName : "checkForGLErrors"});
+	if(error != 0) haxe_Log.trace("GL Error: " + error,{ fileName : "HardwareRenderer.hx", lineNumber : 381, className : "com.haxepunk.graphics.atlas.HardwareRenderer", methodName : "checkForGLErrors"});
 };
 com_haxepunk_graphics_atlas_HardwareRenderer.ortho = function(x0,x1,y0,y1,zNear,zFar) {
 	var sx = 1.0 / (x1 - x0);
@@ -11453,6 +11516,18 @@ com_haxepunk_graphics_atlas_SceneSprite.prototype = $extend(openfl_display_Sprit
 		if(this.draw != null) this.draw.recycle();
 		this.draw = this.last = null;
 		com_haxepunk_graphics_atlas_HardwareRenderer.startFrame(this.scene);
+		if(this.scene.alpha > 0) {
+			var command = this.getDrawCommand(null,false,10);
+			var sceneColor;
+			if(this.scene.color == null) sceneColor = com_haxepunk_HXP.stage.get_color(); else sceneColor = this.scene.color;
+			var red = (sceneColor >> 16 & 255) / 255;
+			var green = (sceneColor >> 8 & 255) / 255;
+			var blue = (sceneColor & 255) / 255;
+			var w = com_haxepunk_HXP.width * com_haxepunk_HXP.screen.fullScaleX;
+			var h = com_haxepunk_HXP.height * com_haxepunk_HXP.screen.fullScaleY;
+			command.addTriangle(0,0,0,0,w,0,0,0,0,h,0,0,red,green,blue,this.scene.alpha);
+			command.addTriangle(0,h,0,0,w,0,0,0,w,h,0,0,red,green,blue,this.scene.alpha);
+		}
 	}
 	,endFrame: function() {
 		com_haxepunk_graphics_atlas_HardwareRenderer.endFrame(this.scene);
@@ -11467,10 +11542,12 @@ com_haxepunk_graphics_atlas_SceneSprite.prototype = $extend(openfl_display_Sprit
 		return command;
 	}
 	,renderScene: function(rect) {
-		var currentDraw = this.draw;
-		while(currentDraw != null) {
-			com_haxepunk_graphics_atlas_HardwareRenderer.render(currentDraw,this.scene,rect);
-			currentDraw = currentDraw._next;
+		if(this.scene._drawn && this.scene.visible) {
+			var currentDraw = this.draw;
+			while(currentDraw != null) {
+				com_haxepunk_graphics_atlas_HardwareRenderer.render(currentDraw,this.scene,rect);
+				currentDraw = currentDraw._next;
+			}
 		}
 	}
 	,scene: null
@@ -15536,7 +15613,7 @@ var lime_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 646555;
+	this.version = 789559;
 };
 $hxClasses["lime.AssetCache"] = lime_AssetCache;
 lime_AssetCache.__name__ = ["lime","AssetCache"];
@@ -52862,18 +52939,26 @@ whathaveidone_scenes_GameScene.prototype = $extend(com_haxepunk_Scene.prototype,
 	,__class__: whathaveidone_scenes_GameScene
 });
 var whathaveidone_scenes_TitleScene = function() {
+	this.fade = false;
 	com_haxepunk_Scene.call(this);
-	var txt = new com_haxepunk_graphics_BitmapText("WHAT HAVE I DONE?\n\nA virtual pet simulator\n\nCreated by bendmorris for Ludum Dare 37\n\nClick to begin",null,null,null,null,{ font : "assets/fonts/a_little_sunshine_regular_48.fnt"});
-	txt.x = 16;
-	txt.y = 16;
-	this.addGraphic(txt);
+	this.txt = new com_haxepunk_graphics_BitmapText("WHAT HAVE I DONE?\n\nA virtual pet simulator\n\nCreated by bendmorris for Ludum Dare 37\n\nClick to begin",null,null,null,null,{ font : "assets/fonts/a_little_sunshine_regular_48.fnt"});
+	this.txt.x = 16;
+	this.txt.y = 16;
+	this.addGraphic(this.txt);
+	this.color = 0;
+	this.alpha = 1;
 };
 $hxClasses["whathaveidone.scenes.TitleScene"] = whathaveidone_scenes_TitleScene;
 whathaveidone_scenes_TitleScene.__name__ = ["whathaveidone","scenes","TitleScene"];
 whathaveidone_scenes_TitleScene.__super__ = com_haxepunk_Scene;
 whathaveidone_scenes_TitleScene.prototype = $extend(com_haxepunk_Scene.prototype,{
-	update: function() {
-		if(com_haxepunk_utils_Input.mousePressed) com_haxepunk_HXP.engine.popScene();
+	fade: null
+	,txt: null
+	,update: function() {
+		if(this.fade) {
+			this.txt.set_alpha(this.alpha -= com_haxepunk_HXP.elapsed / 0.75);
+			if(this.alpha <= 0) com_haxepunk_HXP.engine.popScene();
+		} else if(com_haxepunk_utils_Input.mousePressed) this.fade = true;
 	}
 	,__class__: whathaveidone_scenes_TitleScene
 });
@@ -53004,9 +53089,10 @@ com_haxepunk_graphics_atlas__$BlendMode_BlendMode_$Impl_$.Multiply = 9;
 com_haxepunk_graphics_atlas__$BlendMode_BlendMode_$Impl_$.Normal = 10;
 com_haxepunk_graphics_atlas__$BlendMode_BlendMode_$Impl_$.Screen = 12;
 com_haxepunk_graphics_atlas__$BlendMode_BlendMode_$Impl_$.Subtract = 14;
-com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader.VERTEX_SHADER = "// HaxePunk HardwareRenderer vertex shader\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nattribute vec4 aPosition;\nattribute vec2 aTexCoord;\nattribute vec4 aColor;\nvarying vec2 vTexCoord;\nvarying vec4 vColor;\nuniform mat4 uMatrix;\n\nvoid main(void) {\n\tvTexCoord = aTexCoord;\n\tvColor = aColor;\n\tgl_Position = uMatrix * aPosition;\n}";
-com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader.FRAGMENT_SHADER = "// HaxePunk HardwareRenderer fragment shader\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nvarying vec2 vTexCoord;\nvarying vec4 vColor;\nuniform sampler2D uImage0;\n\nvoid main(void) {\n\tvec4 color = texture2D(uImage0, vTexCoord);\n\tif (color.a == 0.0) {\n\t\tgl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\n\t} else {\n\t\tgl_FragColor = vec4(color.rgb / color.a, color.a) * vColor;\n\t}\n}";
-com_haxepunk_graphics_atlas_HardwareRenderer.BUFFER_CHUNK = 24;
+com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader.VERTEX_SHADER = "// HaxePunk HardwareRenderer texture vertex shader\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nattribute vec4 aPosition;\nattribute vec4 aColor;\nattribute vec2 aTexCoord;\nvarying vec2 vTexCoord;\nvarying vec4 vColor;\nuniform mat4 uMatrix;\n\nvoid main(void) {\n\tvColor = aColor;\n\tvTexCoord = aTexCoord;\n\tgl_Position = uMatrix * aPosition;\n}";
+com_haxepunk_graphics_atlas__$HardwareRenderer_TextureShader.FRAGMENT_SHADER = "// HaxePunk HardwareRenderer texture fragment shader\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nvarying vec4 vColor;\nvarying vec2 vTexCoord;\nuniform sampler2D uImage0;\n\nvoid main(void) {\n\tvec4 color = texture2D(uImage0, vTexCoord);\n\tif (color.a == 0.0) {\n\t\tgl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\n\t} else {\n\t\tgl_FragColor = vec4(color.rgb / color.a, color.a) * vColor;\n\t}\n}";
+com_haxepunk_graphics_atlas__$HardwareRenderer_ColorShader.VERTEX_SHADER = "// HaxePunk HardwareRenderer color vertex shader\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nattribute vec4 aPosition;\nattribute vec4 aColor;\nvarying vec4 vColor;\nuniform mat4 uMatrix;\n\nvoid main(void) {\n\tvColor = aColor;\n\tgl_Position = uMatrix * aPosition;\n}";
+com_haxepunk_graphics_atlas__$HardwareRenderer_ColorShader.FRAGMENT_SHADER = "// HaxePunk HardwareRenderer color fragment shader\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nvarying vec4 vColor;\n\nvoid main(void) {\n\tgl_FragColor = clamp(vColor, 0.0, 1.0);\n\t//gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n}";
 com_haxepunk_graphics_atlas_HardwareRenderer.FLOAT32_BYTES = 4;
 com_haxepunk_graphics_atlas_HardwareRenderer._point = new openfl_geom_Point();
 com_haxepunk_graphics_atlas_HardwareRenderer._f32 = (function($this) {
@@ -54674,5 +54760,6 @@ whathaveidone_graphics_Flash.FLASH_TIME = 0.5;
 whathaveidone_graphics_SpineBase.CHAR_SCALE = 0.5;
 whathaveidone_graphics_SpineBase.skeletonDataCache = new haxe_ds_StringMap();
 whathaveidone_scenes_GameOverScene.FADE_TIME = 5;
+whathaveidone_scenes_TitleScene.FADE_TIME = 0.75;
 ApplicationMain.main();
 })(typeof console != "undefined" ? console : {log:function(){}}, typeof window != "undefined" ? window : typeof exports != "undefined" ? exports : typeof self != "undefined" ? self : this, typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);
