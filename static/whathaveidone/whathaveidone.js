@@ -13,7 +13,7 @@ var ApplicationMain = function() { };
 $hxClasses["ApplicationMain"] = ApplicationMain;
 ApplicationMain.__name__ = ["ApplicationMain"];
 ApplicationMain.main = function() {
-	ApplicationMain.config = { build : "16", company : "MouseMob", file : "whathaveidone", fps : 60, name : "whathaveidone", orientation : "portrait", packageName : "com.example.myapp", version : "0.1.0", windows : [{ allowHighDPI : false, antialiasing : 4, background : 0, borderless : false, depthBuffer : false, display : 0, fullscreen : false, hardware : true, height : 480, hidden : null, maximized : null, minimized : null, parameters : "{}", resizable : true, stencilBuffer : true, title : "whathaveidone", vsync : true, width : 800, x : null, y : null}]};
+	ApplicationMain.config = { build : "17", company : "MouseMob", file : "whathaveidone", fps : 60, name : "whathaveidone", orientation : "portrait", packageName : "com.example.myapp", version : "0.1.0", windows : [{ allowHighDPI : false, antialiasing : 4, background : 0, borderless : false, depthBuffer : false, display : 0, fullscreen : false, hardware : true, height : 480, hidden : null, maximized : null, minimized : null, parameters : "{}", resizable : true, stencilBuffer : true, title : "whathaveidone", vsync : true, width : 800, x : null, y : null}]};
 };
 ApplicationMain.create = function() {
 	var app = new openfl_display_Application();
@@ -15613,7 +15613,7 @@ var lime_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 789559;
+	this.version = 972054;
 };
 $hxClasses["lime.AssetCache"] = lime_AssetCache;
 lime_AssetCache.__name__ = ["lime","AssetCache"];
